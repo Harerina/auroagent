@@ -45,11 +45,11 @@ const curatedPost = {
 };
 
 export default function AuroDashboard() {
-  const [currentImage, setCurrentImage] = useState(imageList[0]);
+  const [currentImage, setCurrentImage] = useState("/images/none.jpg");
   const [curatedData, setCuratedData] = useState({
-    vibe: "",
-    hashtags: [],
-    location: "",
+    vibe: "None",
+    hashtags: ["#none"],
+    location: "None",
   });
   const [isPosting, setIsPosting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -162,7 +162,7 @@ export default function AuroDashboard() {
                     your_brand
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    London, United Kingdom
+                    {curatedData.location}
                   </p>
                 </div>
               </div>
