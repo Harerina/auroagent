@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.arrayBuffer();
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `You are a sophisticated London-based Instagrammer and Software Engineer. 
     Identify the location from the image and provide a minimalist vibe.

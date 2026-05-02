@@ -114,7 +114,8 @@ export default function AuroDashboard() {
 
             <Button
               onClick={handleGenerate}
-              className="h-9 px-4 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20"
+              className="h-9 px-4 text-sm font-semibold text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20"
+              style={{ backgroundColor: "#89D8BE" }}
             >
               <Sparkles className="h-4 w-4 mr-2" />
               Generate
