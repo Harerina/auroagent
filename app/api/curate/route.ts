@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const { imagePath } = await request.json();
 
-    const imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${imagePath}`;
+    const imageUrl = new URL(imagePath, request.url).toString();
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.arrayBuffer();
 
@@ -33,10 +33,17 @@ export async function POST(request: NextRequest) {
       },
     ]);
 
-    const responseText = result.response.text();
-
+    const responseText = await result.response.text();
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    const content = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+    const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+
+    const content = {
+      vibe: "None",
+      hashtags: ["#none"],
+      location: "None",
+      ...parsed,
+      hashtags: Array.isArray(parsed?.hashtags) ? parsed.hashtags : ["#none"],
+    };
 
     return NextResponse.json(content);
   } catch (error) {

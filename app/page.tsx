@@ -44,13 +44,15 @@ const curatedPost = {
   },
 };
 
+const defaultCuratedData = {
+  vibe: "None",
+  hashtags: ["#none"],
+  location: "None",
+};
+
 export default function AuroDashboard() {
   const [currentImage, setCurrentImage] = useState("/images/none.jpg");
-  const [curatedData, setCuratedData] = useState({
-    vibe: "None",
-    hashtags: ["#none"],
-    location: "None",
-  });
+  const [curatedData, setCuratedData] = useState(defaultCuratedData);
   const [isPosting, setIsPosting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [posted, setPosted] = useState(false);
@@ -67,14 +69,19 @@ export default function AuroDashboard() {
         body: JSON.stringify({ imagePath: nextImage }),
       });
       const data = await response.json();
-      setCuratedData(data);
+      setCuratedData({
+        ...defaultCuratedData,
+        ...(data?.vibe ? { vibe: data.vibe } : {}),
+        ...(Array.isArray(data?.hashtags) ? { hashtags: data.hashtags } : {}),
+        ...(data?.location ? { location: data.location } : {}),
+      });
     } catch (error) {
       console.error("Error fetching curated data:", error);
+      setCuratedData(defaultCuratedData);
     } finally {
       setIsRefreshing(false);
     }
   };
-
   const handleApprove = () => {
     setIsPosting(true);
     setTimeout(() => {
@@ -205,14 +212,16 @@ export default function AuroDashboard() {
 
                   {/* Hashtags */}
                   <div className="flex flex-wrap gap-1">
-                    {curatedData.hashtags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="text-xs text-primary font-mono bg-primary/10 px-1 py-0.5 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    {Array.isArray(curatedData.hashtags)
+                      ? curatedData.hashtags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="text-xs text-primary font-mono bg-primary/10 px-1 py-0.5 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))
+                      : null}
                   </div>
                 </div>
               </div>
