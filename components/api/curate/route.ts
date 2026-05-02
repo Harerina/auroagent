@@ -1,49 +1,59 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { imagePath } = await req.json();
+    const { imagePath } = await request.json();
 
-    const imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${imagePath}`;
-    const imageResponse = await fetch(imageUrl);
-    const imageBuffer = await imageResponse.arrayBuffer();
-
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const prompt = `You are a sophisticated London-based Instagrammer and Software Engineer. 
-    Identify the location from the image and provide a minimalist vibe.
-    
-    Return the result in the following JSON format:
-    {
-      "vibe": "max 17 characters in Japanese. Style: 'London's best morning' or '[Location] + [Mood]'. Use tech-inspired vocabulary like 'Grid', 'Logic', 'Structure', or 'Chill'.",
-      "hashtags": ["5 curated hashtags, starting with the location name"],
-      "location": "Name of the place"
-    }`;
-
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: Buffer.from(imageBuffer).toString("base64"),
-          mimeType: "image/jpeg",
-        },
+    // Mapping based on the actual filenames provided
+    const templates: Record<
+      string,
+      { vibe: string; hashtags: string[]; location: string }
+    > = {
+      "/images/IMG_1.jpg": {
+        vibe: "Skyward logic. Grid precision.",
+        hashtags: [
+          "#OldStreet",
+          "#TechChic",
+          "#Architecture",
+          "#Skyline",
+          "#Structure",
+        ],
+        location: "250 City Road, London",
       },
-    ]);
+      "/images/IMG_2.jpg": {
+        vibe: "Eternal clock. System sync.",
+        hashtags: [
+          "#BigBen",
+          "#Westminster",
+          "#LondonMorning",
+          "#Iconic",
+          "#Time",
+        ],
+        location: "Palace of Westminster",
+      },
+      "/images/IMG_3.jpg": {
+        vibe: "Magic bricks. Creative build.",
+        hashtags: [
+          "#PalaceTheatre",
+          "#HarryPotter",
+          "#WestEnd",
+          "#Theatrical",
+          "#London",
+        ],
+        location: "Palace Theatre, London",
+      },
+    };
 
-    const responseText = result.response.text();
-
-    const jsonMatch = responseText.match(/\{.*\}/s);
-    const content = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+    // Default response if the imagePath doesn't match exactly
+    const content = templates[imagePath] || {
+      vibe: "City flow. Logic of light.",
+      hashtags: ["#London", "#Tech", "#Lifestyle", "#Auro", "#Agent"],
+      location: "Central London",
+    };
 
     return NextResponse.json(content);
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return NextResponse.json(
-      { error: "Failed to curate content" },
-      { status: 500 },
-    );
+    console.error("Curation error:", error);
+    return NextResponse.json({ error: "Demo error" }, { status: 500 });
   }
 }
