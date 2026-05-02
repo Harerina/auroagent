@@ -141,8 +141,26 @@ export default function AuroDashboard() {
     }
   };
 
-  const handleRefresh = () => {
-    handleGenerate();
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setPosted(false);
+
+    try {
+      await fetch("/api/mubit/reject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imagePath: currentImage,
+          reason: "User requested another option",
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      console.log("MUBIT: Image stored for midnight reflection batch.");
+    } catch (e) {
+      console.error("MUBIT: Failed to store reflection data", e);
+    }
+
+    await handleGenerate();
   };
 
   return (
@@ -364,12 +382,21 @@ export default function AuroDashboard() {
                     onClick={handleRefresh}
                     disabled={isRefreshing || isPosting}
                     variant="outline"
-                    className="w-full h-11 text-sm font-semibold border-border/50 hover:bg-secondary rounded-lg transition-all"
+                    className="w-full h-11 text-sm font-semibold border-border/50 hover:bg-secondary hover:border-primary/30 rounded-lg transition-all group"
                   >
-                    <RefreshCw
-                      className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
-                    />
-                    Pick Another One
+                    {isRefreshing ? (
+                      <div className="flex items-center gap-2.5">
+                        <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+                        <span className="text-primary">
+                          MUBIT: Learning your Aura...
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2.5">
+                        <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
+                        <span>Pick Another One</span>
+                      </div>
+                    )}
                   </Button>
                 </>
               )}
