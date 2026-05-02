@@ -363,7 +363,7 @@ export default function AuroDashboard() {
             <Button
               onClick={handleGenerate}
               disabled={isRefreshing}
-              className="h-9 px-4 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]"
+              className="h-9 px-4 text-sm font-semibold bg-[#89D8BE] hover:bg-[#89D8BE]/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-[#89D8BE]/20 hover:shadow-[#89D8BE]/40 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Sparkles
                 className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
@@ -615,7 +615,7 @@ export default function AuroDashboard() {
                   <Button
                     onClick={handleApprove}
                     disabled={isPosting || isRefreshing || isDefaultImage}
-                    className="w-full h-11 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:hover:scale-100"
+                    className="h-9 px-4 text-sm font-semibold bg-[#89D8BE] hover:bg-[#89D8BE]/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-[#89D8BE]/20 hover:shadow-[#89D8BE]/40 hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {isPosting ? (
                       <div className="flex items-center gap-2.5">
