@@ -17,6 +17,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+const imageList = [
+  "/images/image_building.jpg",
+  "/images/image_food.jpg",
+  "/images/image_human.jpg",
+];
+
 const curatedPost = {
   image: "/images/curated-post.jpg",
   caption:
@@ -39,9 +45,15 @@ const curatedPost = {
 };
 
 export function AuroDashboard() {
+  const [currentImage, setCurrentImage] = useState(imageList[0]);
   const [isPosting, setIsPosting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [posted, setPosted] = useState(false);
+
+  const handleGenerate = () => {
+    const nextImage = imageList[Math.floor(Math.random() * imageList.length)];
+    setCurrentImage(nextImage);
+  };
 
   const handleApprove = () => {
     setIsPosting(true);
@@ -80,7 +92,10 @@ export function AuroDashboard() {
               </p>
             </div>
 
-            <Button className="h-9 px-4 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20">
+            <Button
+              onClick={handleGenerate}
+              className="h-9 px-4 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20"
+            >
               <Sparkles className="h-4 w-4 mr-2" />
               Generate
             </Button>
@@ -136,7 +151,7 @@ export function AuroDashboard() {
               <div className="w-full bg-secondary">
                 <div className="relative w-full" style={{ aspectRatio: "4/5" }}>
                   <Image
-                    src={curatedPost.image}
+                    src={currentImage}
                     alt="Curated Instagram post"
                     fill
                     className="object-cover"
