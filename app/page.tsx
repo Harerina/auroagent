@@ -23,6 +23,39 @@ const imageList = [
   "/images/IMG_3.jpg",
 ];
 
+const imagePresets: Record<
+  string,
+  { vibe: string; hashtags: string[]; location: string }
+> = {
+  "/images/IMG_1.jpg": {
+    vibe: "Skyward logic. Grid precision.",
+    hashtags: [
+      "#OldStreet",
+      "#TechChic",
+      "#Architecture",
+      "#Skyline",
+      "#Structure",
+    ],
+    location: "250 City Road, London",
+  },
+  "/images/IMG_2.jpg": {
+    vibe: "Eternal clock. System sync.",
+    hashtags: ["#BigBen", "#Westminster", "#LondonMorning", "#Iconic", "#Time"],
+    location: "Palace of Westminster",
+  },
+  "/images/IMG_3.jpg": {
+    vibe: "Magic bricks. Creative build.",
+    hashtags: [
+      "#PalaceTheatre",
+      "#HarryPotter",
+      "#WestEnd",
+      "#Theatrical",
+      "#London",
+    ],
+    location: "Palace Theatre, London",
+  },
+};
+
 const curatedPost = {
   image: "/images/curated-post.jpg",
   caption:
@@ -59,8 +92,12 @@ export default function AuroDashboard() {
 
   const handleGenerate = async () => {
     setIsRefreshing(true);
+    setPosted(false);
     const nextImage = imageList[Math.floor(Math.random() * imageList.length)];
     setCurrentImage(nextImage);
+
+    const preset = imagePresets[nextImage] || defaultCuratedData;
+    setCuratedData(preset);
 
     try {
       const response = await fetch("/api/curate", {
@@ -69,33 +106,43 @@ export default function AuroDashboard() {
         body: JSON.stringify({ imagePath: nextImage }),
       });
       const data = await response.json();
-      setCuratedData({
-        ...defaultCuratedData,
-        ...(data?.vibe ? { vibe: data.vibe } : {}),
-        ...(Array.isArray(data?.hashtags) ? { hashtags: data.hashtags } : {}),
-        ...(data?.location ? { location: data.location } : {}),
-      });
+
+      if (data.vibe && data.vibe !== "None") {
+        setCuratedData({
+          vibe: data.vibe,
+          hashtags: Array.isArray(data.hashtags)
+            ? data.hashtags
+            : preset.hashtags,
+          location: data.location || preset.location,
+        });
+      }
     } catch (error) {
       console.error("Error fetching curated data:", error);
-      setCuratedData(defaultCuratedData);
     } finally {
       setIsRefreshing(false);
     }
   };
-  const handleApprove = () => {
+
+  const handleApprove = async () => {
     setIsPosting(true);
-    setTimeout(() => {
-      setIsPosting(false);
+    try {
+      await fetch("/api/workflow/notify", {
+        method: "POST",
+        body: JSON.stringify({
+          eventId: "wait-for-approval",
+          payload: { status: "approved" },
+        }),
+      });
       setPosted(true);
-    }, 2000);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsPosting(false);
+    }
   };
 
   const handleRefresh = () => {
-    setIsRefreshing(true);
-    setPosted(false);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 1500);
+    handleGenerate();
   };
 
   return (
@@ -121,11 +168,14 @@ export default function AuroDashboard() {
 
             <Button
               onClick={handleGenerate}
+              disabled={isRefreshing}
               className="h-9 px-4 text-sm font-semibold text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20"
               style={{ backgroundColor: "#89D8BE" }}
             >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Generate
+              <Sparkles
+                className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+              />
+              {isRefreshing ? "Analyzing..." : "Generate"}
             </Button>
           </div>
 
@@ -160,7 +210,6 @@ export default function AuroDashboard() {
             </div>
 
             <Card className="flex flex-col overflow-hidden bg-card border-border/50">
-              {/* Instagram-style header */}
               <div className="flex-shrink-0 flex items-center gap-3 px-3 py-2.5 border-b border-border/50">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/60 to-primary/20 flex items-center justify-center">
                   <Camera className="h-4 w-4 text-primary-foreground" />
@@ -175,7 +224,6 @@ export default function AuroDashboard() {
                 </div>
               </div>
 
-              {/* Image - Fixed 4:5 aspect ratio, width-contained */}
               <div className="w-full bg-secondary">
                 <div className="relative w-full" style={{ aspectRatio: "4/5" }}>
                   <Image
@@ -188,7 +236,6 @@ export default function AuroDashboard() {
                 </div>
               </div>
 
-              {/* Instagram-style actions */}
               <div className="p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
@@ -199,29 +246,23 @@ export default function AuroDashboard() {
                   <Bookmark className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
                 </div>
 
-                {/* Caption */}
                 <div>
                   <p className="text-sm text-foreground leading-relaxed mb-1.5">
                     <span className="font-semibold">your_brand</span>{" "}
                     <span className="text-lg font-bold text-primary">
-                      {isRefreshing
-                        ? "Curating your morning..."
-                        : curatedData.vibe}
+                      {curatedData.vibe}
                     </span>
                   </p>
 
-                  {/* Hashtags */}
                   <div className="flex flex-wrap gap-1">
-                    {Array.isArray(curatedData.hashtags)
-                      ? curatedData.hashtags.map((tag, index) => (
-                          <span
-                            key={index}
-                            className="text-xs text-primary font-mono bg-primary/10 px-1 py-0.5 rounded"
-                          >
-                            {tag}
-                          </span>
-                        ))
-                      : null}
+                    {(curatedData.hashtags || []).map((tag, index) => (
+                      <span
+                        key={index}
+                        className="text-xs text-primary font-mono bg-primary/10 px-1 py-0.5 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -230,12 +271,10 @@ export default function AuroDashboard() {
 
           {/* Right: Analytics & Actions */}
           <div className="flex flex-col gap-4">
-            {/* Engagement Prediction */}
             <div className="flex-shrink-0">
               <h2 className="text-xs font-mono text-muted-foreground tracking-wider uppercase mb-3">
                 Engagement Prediction
               </h2>
-
               <div className="grid grid-cols-2 gap-3">
                 <Card className="p-3 bg-card border-border/50">
                   <div className="flex items-center gap-2 mb-1.5">
@@ -248,7 +287,6 @@ export default function AuroDashboard() {
                     {curatedPost.engagement.estimatedLikes}
                   </p>
                 </Card>
-
                 <Card className="p-3 bg-card border-border/50">
                   <div className="flex items-center gap-2 mb-1.5">
                     <Clock className="h-3.5 w-3.5 text-primary" />
@@ -263,7 +301,6 @@ export default function AuroDashboard() {
               </div>
             </div>
 
-            {/* AI Insights */}
             <Card className="p-4 bg-card border-border/50">
               <h3 className="text-xs font-mono text-muted-foreground tracking-wider uppercase mb-3">
                 AI Insights
@@ -291,26 +328,29 @@ export default function AuroDashboard() {
               </ul>
             </Card>
 
-            {/* Action Buttons */}
             <div className="flex-shrink-0 space-y-2.5">
               {posted ? (
-                <div className="flex items-center justify-center gap-2.5 p-3 rounded-lg bg-[#88d8c0]/10 border border-[#88d8c0]/30">
+                <div className="flex items-center justify-center gap-2.5 p-3 rounded-lg bg-[#88d8c0]/10 border border-[#88d8c0]/30 animate-in fade-in zoom-in">
                   <Check className="h-4 w-4 text-[#88d8c0]" />
                   <span className="font-medium text-[#88d8c0] text-sm">
-                    Posted Successfully
+                    Posted Successfully to note.com
                   </span>
                 </div>
               ) : (
                 <>
                   <Button
                     onClick={handleApprove}
-                    disabled={isPosting}
-                    className="w-full h-11 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all duration-300 shadow-lg shadow-primary/20"
+                    disabled={
+                      isPosting ||
+                      isRefreshing ||
+                      currentImage === "/images/none.jpg"
+                    }
+                    className="w-full h-11 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all shadow-lg shadow-primary/20"
                   >
                     {isPosting ? (
                       <div className="flex items-center gap-2.5">
-                        <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                        <span>Posting to Instagram...</span>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        <span>Finalizing...</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2.5">
@@ -319,51 +359,19 @@ export default function AuroDashboard() {
                       </div>
                     )}
                   </Button>
-
                   <Button
                     onClick={handleRefresh}
                     disabled={isRefreshing || isPosting}
                     variant="outline"
-                    className="w-full h-11 text-sm font-semibold border-border/50 hover:bg-secondary hover:border-primary/30 rounded-lg transition-all duration-300"
+                    className="w-full h-11 text-sm font-semibold border-border/50 hover:bg-secondary rounded-lg transition-all"
                   >
-                    {isRefreshing ? (
-                      <div className="flex items-center gap-2.5">
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                        <span>Finding another...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2.5">
-                        <RefreshCw className="h-4 w-4" />
-                        <span>Pick Another One</span>
-                      </div>
-                    )}
+                    <RefreshCw
+                      className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+                    />
+                    Pick Another One
                   </Button>
                 </>
               )}
-            </div>
-
-            {/* Footer Stats */}
-            <div className="flex-shrink-0 pt-3 border-t border-border/50">
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div>
-                  <p className="text-xl font-semibold text-foreground">12</p>
-                  <p className="text-xs font-mono text-muted-foreground uppercase">
-                    Posts Today
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xl font-semibold text-foreground">89%</p>
-                  <p className="text-xs font-mono text-muted-foreground uppercase">
-                    Approval
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xl font-semibold text-primary">+34%</p>
-                  <p className="text-xs font-mono text-muted-foreground uppercase">
-                    Engagement
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
