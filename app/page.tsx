@@ -345,7 +345,8 @@ export default function AuroDashboard() {
                       isRefreshing ||
                       currentImage === "/images/none.jpg"
                     }
-                    className="w-full h-11 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all shadow-lg shadow-primary/20"
+                    className="w-full h-11 text-sm font-semibold text-primary-foreground rounded-lg transition-all shadow-lg shadow-primary/20"
+                    style={{ backgroundColor: "#89D8BE" }}
                   >
                     {isPosting ? (
                       <div className="flex items-center gap-2.5">
