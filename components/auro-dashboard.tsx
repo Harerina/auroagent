@@ -38,7 +38,7 @@ const curatedPost = {
   },
 };
 
-export function AuroDashboard() {
+export default function Home() {
   const [isPosting, setIsPosting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [posted, setPosted] = useState(false);
