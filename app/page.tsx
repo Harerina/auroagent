@@ -18,9 +18,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 const imageList = [
-  "/images/image_building.jpg",
-  "/images/image_food.jpg",
-  "/images/image_human.jpg",
+  "/images/IMG_1.jpg",
+  "/images/IMG_2.jpg",
+  "/images/IMG_3.jpg",
 ];
 
 const curatedPost = {
@@ -46,13 +46,33 @@ const curatedPost = {
 
 export default function AuroDashboard() {
   const [currentImage, setCurrentImage] = useState(imageList[0]);
+  const [curatedData, setCuratedData] = useState({
+    vibe: "",
+    hashtags: [],
+    location: "",
+  });
   const [isPosting, setIsPosting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [posted, setPosted] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    setIsRefreshing(true);
     const nextImage = imageList[Math.floor(Math.random() * imageList.length)];
     setCurrentImage(nextImage);
+
+    try {
+      const response = await fetch("/api/curate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imagePath: nextImage }),
+      });
+      const data = await response.json();
+      setCuratedData(data);
+    } catch (error) {
+      console.error("Error fetching curated data:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handleApprove = () => {
@@ -175,13 +195,24 @@ export default function AuroDashboard() {
                 <div>
                   <p className="text-sm text-foreground leading-relaxed mb-1.5">
                     <span className="font-semibold">your_brand</span>{" "}
-                    {curatedPost.caption}
+                    <span className="text-lg font-bold text-primary">
+                      {isRefreshing
+                        ? "Curating your morning..."
+                        : curatedData.vibe}
+                    </span>
                   </p>
 
                   {/* Hashtags */}
-                  <p className="text-xs text-primary/80">
-                    {curatedPost.hashtags.join(" ")}
-                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {curatedData.hashtags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="text-xs text-primary font-mono bg-primary/10 px-1 py-0.5 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </Card>
