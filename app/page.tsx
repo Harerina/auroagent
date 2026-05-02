@@ -44,7 +44,7 @@ const curatedPost = {
   },
 };
 
-export function AuroDashboard() {
+export default function AuroDashboard() {
   const [currentImage, setCurrentImage] = useState(imageList[0]);
   const [isPosting, setIsPosting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
