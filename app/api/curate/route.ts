@@ -37,11 +37,10 @@ export async function POST(request: NextRequest) {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
 
+    // 重複を削除し、安全にマージする形式に修正
     const content = {
-      vibe: "None",
-      hashtags: ["#none"],
-      location: "None",
-      ...parsed,
+      vibe: parsed.vibe || "None",
+      location: parsed.location || "None",
       hashtags: Array.isArray(parsed?.hashtags) ? parsed.hashtags : ["#none"],
     };
 
