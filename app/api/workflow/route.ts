@@ -21,6 +21,8 @@ export const { POST } = serve(async (context) => {
   await context.waitForEvent("wait-for-approval", "24h");
 
   await context.run("post-to-note", async () => {
-    console.log("Success: Posted to your SNS");
+    console.log("Success: Posted to note.com");
   });
 });
+
+export const GET = POST;
