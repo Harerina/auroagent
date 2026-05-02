@@ -21,7 +21,7 @@ Auro is an autonomous AI agent designed for busy creators who want to maintain a
 1.  **Morning Curation**: Every morning, Auro scans your camera roll and selects the single most "vibey" photo from the previous day.
 2.  **Next-Gen Analysis**: Using **Gemini 3 Flash**, Auro analyzes architecture, lighting, and mood to generate tech-chic captions, precise location tags, and optimized hashtags.
 3.  **Human-in-the-Loop**: Auro sends a preview directly to your phone via Telegram.
-4.  **Learning from Feedback (MUBIT Logic)**: Auro doesn't just suggest; it learns. By tracking which suggestions you "Approve" and which ones you "Pick Another One" (Reject), it fine-tunes its aesthetic engine. It learns what you _don't_ like as much as what you do, perfecting your unique digital "Aura."
+4.  MUBIT (Metadata User-Behavior Iterative Training): Auro doesn't just suggest; it evolves. When you click "Pick Another One," the rejected image is instantly queued for the "Midnight Reflection" process. Auro learns from what you dismiss, ensuring its aesthetic judgment aligns with yours over time.
 
 ---
 
@@ -36,13 +36,20 @@ Auro is an autonomous AI agent designed for busy creators who want to maintain a
 
 ---
 
-## 🚀 Future Vision: Beyond the Skyline
+ロンドン時間 16:27、提出まで残り 3分 です！音葉さんの建築学科での研究背景と、MUBIT の学習ロジックを融合させた、説得力のある Future Vision セクションを完成させました。
 
-While the current version focuses on **London Architecture** (reflecting my urban planning roots), Auro is designed to evolve:
+特に「画像そのものを保存し、深夜に自己反省（Self-Reflection）を行う」というプロセスを強調し、エンジニアとしての技術的深みをアピールしています。
 
-- **Deep Learning from "Dislike"**: Strengthening the feedback loop to understand user preferences beyond simple likes, ensuring the agent's aesthetic evolves with the user.
-- **Thematic Days**: "Foodie Fridays" or "Musical Mondays" where the agent reads specific categories from your camera roll.
-- **Cross-Platform Symbiosis**: Expanding from `note.com` and Instagram to any platform where your story deserves to be told effortlessly.
+🚀 Future Vision: Beyond the Skyline
+While the current version focuses on London Architecture (reflecting my urban planning roots), Auro is designed to evolve into a deeply personalized life-curator:
+
+MUBIT: Image-Based Self-Reflection Loop: Beyond simple likes, Auro will store every "rejected" image to perform a daily Midnight Reflection. Automatically at 24:00, a Vercel Workflow triggers a batch analysis session where Gemini 3 Flash reviews rejected visual patterns—such as lighting, composition, or structural density—to refine the agent's aesthetic judgment for the next day.
+
+Thematic Evolution: Leveraging my background in urban planning and architecture, the agent will expand into thematic curation, such as "Foodie Fridays" or "Musical Mondays," intelligently categorizing and analyzing diverse aspects of a user's life.
+
+Deep Aesthetic Personalization: By learning from what the user dislikes, the agent will evolve from a generic analyzer into a specialized curator capable of understanding nuanced preferences like "Minimalism vs. Brutalism" or "Authentic Urban Decay vs. Polished Landmarks."
+
+Cross-Platform Symbiosis: Expanding the deployment pipeline from note.com and Instagram to any platform where the user's daily "Aura" deserves to be shared effortlessly.
 
 ---
 
